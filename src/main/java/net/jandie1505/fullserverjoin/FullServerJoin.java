@@ -25,7 +25,7 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
 
         YamlConfiguration defaultConfig = new YamlConfiguration();
         defaultConfig.set("maxLevel", 10);
-        defaultConfig.setComments("maxLevel", List.of("The maximum level for join permissions"));
+        defaultConfig.setComments("maxLevel", List.of("The maximum level for join permissions", "Higher levels will be ignored"));
 
         defaultConfig.set("kickMessage", "&cYou have been kicked to make room for a player with higher priority");
         defaultConfig.setComments("kickMessage", List.of("Players will see this message when getting kicked to make room for a player with higher priority"));
