@@ -1,0 +1,30 @@
+main: net.jandie1505.fullserverjoin.FullServerJoin
+name: 'FullServerJoin'
+version: 1.0
+permissions:
+  fullserverjoin.level.highest:
+    description: 'Set the join level for that player to the maximum integer value'
+  fullserverjoin.level.10:
+    description: 'Specific join level'
+  fullserverjoin.level.9:
+    description: 'Specific join level'
+  fullserverjoin.level.8:
+    description: 'Specific join level'
+  fullserverjoin.level.7:
+    description: 'Specific join level'
+  fullserverjoin.level.6:
+    description: 'Specific join level'
+  fullserverjoin.level.5:
+    description: 'Specific join level'
+  fullserverjoin.level.4:
+    description: 'Specific join level'
+  fullserverjoin.level.3:
+    description: 'Specific join level'
+  fullserverjoin.level.2:
+    description: 'Specific join level'
+  fullserverjoin.level.1:
+    description: 'Specific join level'
+  fullserverjoin.level.0:
+    description: 'Specific join level'
+api-version: 1.13
+website: 'https://github.com/jandie1505/'
