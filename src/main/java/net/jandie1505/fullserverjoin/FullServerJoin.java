@@ -50,7 +50,7 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
             File configFile = new File(this.getDataFolder(), "config.yml");
 
             if (!configFile.exists()) {
-                configFile.mkdirs();
+                configFile.getParentFile().mkdirs();
                 configFile.createNewFile();
             }
 
