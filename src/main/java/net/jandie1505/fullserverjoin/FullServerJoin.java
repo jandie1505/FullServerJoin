@@ -1,10 +1,7 @@
 package net.jandie1505.fullserverjoin;
 
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
+import org.bukkit.command.*;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -67,6 +64,13 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
 
         } catch (IOException e) {
             this.getLogger().warning("Could not access config file. Using defaults.");
+        }
+
+        PluginCommand command = this.getCommand("getjoinpriority");
+
+        if (command != null) {
+            command.setExecutor(this);
+            command.setTabCompleter(this);
         }
 
         getServer().getPluginManager().registerEvents(this, this);
