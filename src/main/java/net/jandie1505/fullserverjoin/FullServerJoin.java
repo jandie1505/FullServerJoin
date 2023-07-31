@@ -1,6 +1,10 @@
 package net.jandie1505.fullserverjoin;
 
 import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -13,8 +17,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
-public class FullServerJoin extends JavaPlugin implements Listener {
+public class FullServerJoin extends JavaPlugin implements Listener, CommandExecutor, TabCompleter {
     YamlConfiguration config;
 
     @Override
@@ -26,6 +32,9 @@ public class FullServerJoin extends JavaPlugin implements Listener {
 
         defaultConfig.set("kickMessage", "&cYou have been kicked to make room for a player with higher priority");
         defaultConfig.setComments("kickMessage", List.of("Players will see this message when getting kicked to make room for a player with higher priority"));
+
+        defaultConfig.set("noPermissionMessage", "&cNo permission");
+        defaultConfig.setComments("noPermissionMessage", List.of("The message players see when they have no permission to use plugin commands"));
 
         /*
         defaultConfig.set("alternativePermissionChecks", false);
@@ -85,6 +94,52 @@ public class FullServerJoin extends JavaPlugin implements Listener {
 
         }
 
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+
+        if (!sender.hasPermission("fullserverjoin.command.getjoinpriority")) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', this.config.getString("noPermissionMessage", "&cNo permission")));
+            return true;
+        }
+
+        Player player = null;
+
+        if (args.length < 1) {
+
+            if (sender instanceof Player) {
+                player = (Player) sender;
+            }
+
+        } else {
+
+            try {
+                player = this.getServer().getPlayer(UUID.fromString(args[0]));
+            } catch (IllegalArgumentException e) {
+                player = this.getServer().getPlayer(args[0]);
+            }
+
+        }
+
+        if (player == null) {
+            sender.sendMessage("§cPlayer does not exist");
+            return true;
+        }
+
+        sender.sendMessage("§7Join priority of " + player.getName() + ": " + this.getPlayerPriority(player));
+
+        return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+
+        if (args.length == 1) {
+            return List.copyOf(this.getServer().getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
+        }
+
+        return List.of();
     }
 
     private int getPlayerPriority(Player player) {
