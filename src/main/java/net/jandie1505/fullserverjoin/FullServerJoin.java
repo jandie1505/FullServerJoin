@@ -23,27 +23,9 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
     @Override
     public void onEnable() {
 
-        YamlConfiguration defaultConfig = new YamlConfiguration();
-        defaultConfig.set("maxLevel", 10);
-        defaultConfig.setComments("maxLevel", List.of("The maximum level for join permissions", "Higher levels will be ignored"));
-
-        defaultConfig.set("kickMessage", "&cYou have been kicked to make room for a player with higher priority");
-        defaultConfig.setComments("kickMessage", List.of("Players will see this message when getting kicked to make room for a player with higher priority"));
-
-        defaultConfig.set("noPermissionMessage", "&cNo permission");
-        defaultConfig.setComments("noPermissionMessage", List.of("The message players see when they have no permission to use plugin commands"));
-
-        /*
-        defaultConfig.set("alternativePermissionChecks", false);
-        defaultConfig.setComments("alternativePermissionChecks", List.of(
-                "When enabled, the plugin will iterate through all permissions of that player for getting the join level.",
-                "When disabled, the plugin will iterate through all levels and will do a permission check for each level (starting with the highest level)",
-                "If the players amount of permissions is less than the amount of join levels, enabling this could increase performance."
-        ));
-        */
+        // config
 
         this.config = new YamlConfiguration();
-        this.config.setDefaults(defaultConfig);
 
         try {
 
@@ -52,6 +34,17 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
             if (!configFile.exists()) {
                 configFile.getParentFile().mkdirs();
                 configFile.createNewFile();
+
+                this.config.set("maxLevel", 10);
+                this.config.setComments("maxLevel", List.of("The maximum level for join permissions", "Higher levels will be ignored"));
+
+                this.config.set("kickMessage", "&cYou have been kicked to make room for a player with higher priority");
+                this.config.setComments("kickMessage", List.of("Players will see this message when getting kicked to make room for a player with higher priority"));
+
+                this.config.set("noPermissionMessage", "&cNo permission");
+                this.config.setComments("noPermissionMessage", List.of("The message players see when they have no permission to use plugin commands"));
+
+                this.config.save(new File(this.getDataFolder(), "config.yml"));
             }
 
             try {
@@ -60,11 +53,11 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
                 this.getLogger().warning("Invalid configuration. Using defaults.");
             }
 
-            this.config.save(new File(this.getDataFolder(), "config.yml"));
-
         } catch (IOException e) {
             this.getLogger().warning("Could not access config file. Using defaults.");
         }
+
+        // command
 
         PluginCommand command = this.getCommand("getjoinpriority");
 
@@ -73,7 +66,10 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
             command.setTabCompleter(this);
         }
 
+        // listener
+
         getServer().getPluginManager().registerEvents(this, this);
+
     }
 
     @EventHandler(priority = EventPriority.HIGH)
