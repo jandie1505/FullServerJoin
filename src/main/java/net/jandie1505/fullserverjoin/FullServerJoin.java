@@ -36,7 +36,7 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
                 configFile.createNewFile();
 
                 this.config.set("maxLevel", 10);
-                this.config.setComments("maxLevel", List.of("The maximum level for join permissions", "Higher levels will be ignored"));
+                this.config.setComments("maxLevel", List.of("The maximum level for join permissions", "Levels which are higher than this value will be ignored"));
 
                 this.config.set("kickMessage", "&cYou have been kicked to make room for a player with higher priority");
                 this.config.setComments("kickMessage", List.of("Players will see this message when getting kicked to make room for a player with higher priority"));
