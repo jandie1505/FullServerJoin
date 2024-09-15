@@ -9,7 +9,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +21,17 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class FullServerJoin extends JavaPlugin implements Listener, CommandExecutor, TabCompleter {
-    YamlConfiguration config;
+    public static final String PERMISSION_BYPASS_PLAYER_LIMIT = "fullserverjoin.bypass";
+    public static final String PERMISSION_PREFIX_JOIN_LEVEL = "fullserverjoin.level.";
+    public static final String PERMISSION_JOIN_LEVEL_HIGHEST = PERMISSION_PREFIX_JOIN_LEVEL + "highest";
+    public static final String PERMISSION_COMMAND_GET_JOIN_LEVEL = "fullserverjoin.command.joininfo";
+
+    private static final String CONFIG_MAX_LEVEL = "max_level";
+    private static final String CONFIG_MESSAGE_KICKED_BY_PLAYER = "kicked_by_player_message";
+    private static final String CONFIG_MESSAGE_JOIN_FAILED = "join_failed_message";
+    private static final String CONFIG_MESSAGE_NO_PERMISSION = "no_permission_message";
+
+    private YamlConfiguration config;
 
     @Override
     public void onEnable() {
@@ -26,6 +39,183 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
         // config
 
         this.config = new YamlConfiguration();
+        this.reloadConfig();
+
+        // command
+
+        PluginCommand command = this.getCommand("joininfo");
+        if (command != null) {
+            command.setExecutor(this);
+            command.setTabCompleter(this);
+        }
+
+        // listener
+
+        getServer().getPluginManager().registerEvents(this, this);
+
+        // info
+
+        this.getLogger().info("Successfully activated FULL SERVER JOIN (version " + this.getDescription().getVersion() + "), created by jandie1505.");
+
+    }
+
+    @Override
+    public void onDisable() {
+        this.config = null;
+    }
+
+    // ----- LOGIN EVENT -----
+
+    /**
+     * Login Event that manages if a player is allowed to join or not.
+     */
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerLogin(PlayerLoginEvent event) {
+
+        // Allows players with bypassing permission to join the server under any circumstances
+        if (event.getPlayer().hasPermission(PERMISSION_BYPASS_PLAYER_LIMIT)) {
+            event.allow();
+            return;
+        }
+
+        if (event.getResult() != PlayerLoginEvent.Result.KICK_FULL) return;
+
+        int priority = this.getPlayerPriority(event.getPlayer());
+        if (priority <= 0) return;
+
+        Player playerToKick = this.findPlayerToKick(priority);
+
+        if (playerToKick != null) {
+            playerToKick.kickPlayer(ChatColor.translateAlternateColorCodes('&', this.config.getString(CONFIG_MESSAGE_KICKED_BY_PLAYER, "&cYou have been kicked to make room for a player with higher priority.")));
+            event.allow();
+        } else {
+            event.setKickMessage(ChatColor.translateAlternateColorCodes('&', this.config.getString(CONFIG_MESSAGE_JOIN_FAILED, "This server is full")));
+        }
+
+    }
+
+    // ----- COMMAND -----
+
+    /**
+     * Join info command executor.
+     */
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
+
+        if (!sender.hasPermission(PERMISSION_COMMAND_GET_JOIN_LEVEL)) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', this.config.getString(CONFIG_MESSAGE_NO_PERMISSION, "&cNo permission")));
+            return true;
+        }
+
+        Player player = null;
+
+        if (args.length > 0) {
+            player = this.getPlayerFromString(args[0]);
+        } else {
+            if (sender instanceof Player p) player = p;
+        }
+
+        if (player == null) {
+            sender.sendMessage("§cPlayer does not exist");
+            return true;
+        }
+
+        sender.sendMessage("§7Join information about " + player.getName() + ":§r\n" +
+                "§7- Priority: " + this.getPlayerPriority(player) + "§r\n" +
+                "§7- Bypass permission: " + player.hasPermission(PERMISSION_BYPASS_PLAYER_LIMIT) + "§r"
+        );
+
+        return true;
+    }
+
+    /**
+     * Join info command tab completer.
+     */
+    @Override
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
+        if (!sender.hasPermission(PERMISSION_COMMAND_GET_JOIN_LEVEL)) return List.of();
+        if (args.length == 1) return List.copyOf(this.getServer().getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
+        return List.of();
+    }
+
+    /**
+     * Returns a Player from a string.
+     * @param str player name/uuid string
+     * @return player or null
+     */
+    @Nullable
+    private Player getPlayerFromString(String str) {
+        Player player = null;
+        try {
+            player = this.getServer().getPlayer(UUID.fromString(str));
+        } catch (IllegalArgumentException e) {
+            player = this.getServer().getPlayer(str);
+        }
+        return player;
+    }
+
+    // ----- FIND PLAYER TO KICK -----
+
+    /**
+     * Returns a player with the lowest join priority available on the server.<br/>
+     * Returns null if there is no player with a lower join priority than the specified join priority.
+     * @param levelOfJoiningPlayer level of the player that tries to join
+     * @return player with lower join priority
+     */
+    @Nullable
+    private Player findPlayerToKick(int levelOfJoiningPlayer) {
+        Player lowestPriorityPlayer = null;
+        int lowestPriority = levelOfJoiningPlayer;
+
+        for (Player player : this.getServer().getOnlinePlayers()) {
+            if (player.hasPermission(PERMISSION_BYPASS_PLAYER_LIMIT)) continue;
+            int priority = this.getPlayerPriority(player);
+
+            if (priority < lowestPriority) {
+                lowestPriority = priority;
+                lowestPriorityPlayer = player;
+            }
+
+        }
+
+        return lowestPriorityPlayer;
+    }
+
+    // ----- PLAYER JOIN PRIORITY -----
+
+    /**
+     * Returns the join priority of the specified player.
+     * @param player player
+     * @return player priority
+     */
+    public int getPlayerPriority(@NotNull Player player) {
+
+        if (player.hasPermission(PERMISSION_BYPASS_PLAYER_LIMIT)) return Integer.MAX_VALUE;
+        if (player.hasPermission(PERMISSION_JOIN_LEVEL_HIGHEST)) return Integer.MAX_VALUE;
+
+        int priority = 0; // Default priority for players without the permission
+
+        if (player.hasPermission(PERMISSION_PREFIX_JOIN_LEVEL + "highest")) {
+            return Integer.MAX_VALUE;
+        }
+
+        for (int i = this.config.getInt(CONFIG_MAX_LEVEL, 10); i >= 0; i--) {
+            if (player.hasPermission(PERMISSION_PREFIX_JOIN_LEVEL + i)) {
+                return i;
+            }
+        }
+
+        return priority;
+    }
+
+    // ----- CONFIG -----
+
+    @NotNull
+    public YamlConfiguration getConfig() {
+        return this.config != null ? this.config : new YamlConfiguration();
+    }
+
+    public void reloadConfig() {
 
         try {
 
@@ -35,14 +225,20 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
                 configFile.getParentFile().mkdirs();
                 configFile.createNewFile();
 
-                this.config.set("maxLevel", 10);
-                this.config.setComments("maxLevel", List.of("The maximum level for join permissions", "Levels which are higher than this value will be ignored"));
+                this.config.set(CONFIG_MAX_LEVEL, 10);
+                this.config.setComments(CONFIG_MAX_LEVEL, List.of(
+                        "The maximum level for join permissions.",
+                        "Levels which are higher than this value will be ignored."
+                ));
 
-                this.config.set("kickMessage", "&cYou have been kicked to make room for a player with higher priority");
-                this.config.setComments("kickMessage", List.of("Players will see this message when getting kicked to make room for a player with higher priority"));
+                this.config.set(CONFIG_MESSAGE_KICKED_BY_PLAYER, "&cYou have been kicked to make room for a player with higher priority");
+                this.config.setComments(CONFIG_MESSAGE_KICKED_BY_PLAYER, List.of("Players will see this message when getting kicked to make room for a player with higher priority."));
 
-                this.config.set("noPermissionMessage", "&cNo permission");
-                this.config.setComments("noPermissionMessage", List.of("The message players see when they have no permission to use plugin commands"));
+                this.config.set(CONFIG_MESSAGE_JOIN_FAILED, "The server is full.");
+                this.config.setComments(CONFIG_MESSAGE_JOIN_FAILED, List.of("This message is shown to a player that cannot join the server because there is no player with a lower join level."));
+
+                this.config.set(CONFIG_MESSAGE_NO_PERMISSION, "&cNo permission");
+                this.config.setComments(CONFIG_MESSAGE_NO_PERMISSION, List.of("The message players see when they have no permission to use plugin commands."));
 
                 this.config.save(new File(this.getDataFolder(), "config.yml"));
             }
@@ -57,109 +253,6 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
             this.getLogger().warning("Could not access config file. Using defaults.");
         }
 
-        // command
-
-        PluginCommand command = this.getCommand("getjoinpriority");
-
-        if (command != null) {
-            command.setExecutor(this);
-            command.setTabCompleter(this);
-        }
-
-        // listener
-
-        getServer().getPluginManager().registerEvents(this, this);
-
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onPlayerLogin(PlayerLoginEvent event) {
-
-        if (event.getResult() != PlayerLoginEvent.Result.KICK_FULL) {
-            return;
-        }
-
-        int playerPriority = getPlayerPriority(event.getPlayer());
-
-        for (Player otherPlayer : this.getServer().getOnlinePlayers()) {
-
-            int otherPlayerPriority = getPlayerPriority(otherPlayer);
-
-            if (otherPlayerPriority < playerPriority) {
-                // Kick other player to make room for the joining player
-                otherPlayer.kickPlayer(ChatColor.translateAlternateColorCodes('&', this.config.getString("kickMessage", "&cYou have been kicked to make room for a player with higher priority.")));
-                event.allow(); // Allow the joining player to join
-                return;
-            }
-
-        }
-
-    }
-
-    @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-
-        if (!sender.hasPermission("fullserverjoin.command.getjoinpriority")) {
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', this.config.getString("noPermissionMessage", "&cNo permission")));
-            return true;
-        }
-
-        Player player = null;
-
-        if (args.length < 1) {
-
-            if (sender instanceof Player) {
-                player = (Player) sender;
-            }
-
-        } else {
-
-            try {
-                player = this.getServer().getPlayer(UUID.fromString(args[0]));
-            } catch (IllegalArgumentException e) {
-                player = this.getServer().getPlayer(args[0]);
-            }
-
-        }
-
-        if (player == null) {
-            sender.sendMessage("§cPlayer does not exist");
-            return true;
-        }
-
-        sender.sendMessage("§7Join priority of " + player.getName() + ": " + this.getPlayerPriority(player));
-
-        return true;
-    }
-
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
-
-        if (args.length == 1) {
-            return List.copyOf(this.getServer().getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
-        }
-
-        return List.of();
-    }
-
-    private int getPlayerPriority(Player player) {
-        int defaultPriority = 0; // Default priority for players without the permission
-        String permissionPrefix = "fullserverjoin.level.";
-
-        if (player == null) {
-            return 0;
-        }
-
-        if (player.hasPermission(permissionPrefix + "highest")) {
-            return Integer.MAX_VALUE;
-        }
-
-        for (int i = this.config.getInt("maxLevel", 10); i >= 0; i--) {
-            if (player.hasPermission(permissionPrefix + i)) {
-                return i;
-            }
-        }
-
-        return defaultPriority;
-    }
 }
