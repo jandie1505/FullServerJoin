@@ -9,7 +9,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +26,7 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
     public static final String PERMISSION_COMMAND_GET_JOIN_LEVEL = "fullserverjoin.command.joininfo";
 
     private static final String CONFIG_MAX_LEVEL = "max_level";
-    private static final String CONFIG_MESSAGE_KICKED_BY_PLAYER = "kicked_by_player_message";
+    private static final String CONFIG_MESSAGE_KICK = "kick_message";
     private static final String CONFIG_MESSAGE_NO_PERMISSION = "no_permission_message";
 
     private YamlConfiguration config;
@@ -85,7 +84,7 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
         Player playerToKick = this.findPlayerToKick(priority);
 
         if (playerToKick != null) {
-            playerToKick.kickPlayer(ChatColor.translateAlternateColorCodes('&', this.config.getString(CONFIG_MESSAGE_KICKED_BY_PLAYER, "&cYou have been kicked to make room for a player with higher priority.")));
+            playerToKick.kickPlayer(ChatColor.translateAlternateColorCodes('&', this.config.getString(CONFIG_MESSAGE_KICK, "&cYou have been kicked to make room for a player with higher priority.")));
             event.allow();
         }
 
@@ -228,8 +227,8 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
                         "Levels which are higher than this value will be ignored."
                 ));
 
-                this.config.set(CONFIG_MESSAGE_KICKED_BY_PLAYER, "&cYou have been kicked to make room for a player with higher priority");
-                this.config.setComments(CONFIG_MESSAGE_KICKED_BY_PLAYER, List.of("Players will see this message when getting kicked to make room for a player with higher priority."));
+                this.config.set(CONFIG_MESSAGE_KICK, "&cYou have been kicked to make room for a player with higher priority");
+                this.config.setComments(CONFIG_MESSAGE_KICK, List.of("Players will see this message when getting kicked to make room for a player with higher priority."));
 
                 this.config.set(CONFIG_MESSAGE_NO_PERMISSION, "&cNo permission");
                 this.config.setComments(CONFIG_MESSAGE_NO_PERMISSION, List.of("The message players see when they have no permission to use plugin commands."));
