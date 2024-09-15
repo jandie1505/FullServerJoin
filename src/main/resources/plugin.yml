@@ -4,6 +4,8 @@ version: 1.0
 permissions:
   fullserverjoin.command.joininfo:
     description: 'Permission for command /joininfo'
+  fullserverjoin.bypass:
+    description: 'Bypass player limit on the server'
   fullserverjoin.level.highest:
     description: 'Set the join level for that player to the maximum integer value'
   fullserverjoin.level.10:
