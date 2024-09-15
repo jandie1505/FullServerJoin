@@ -28,7 +28,6 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
 
     private static final String CONFIG_MAX_LEVEL = "max_level";
     private static final String CONFIG_MESSAGE_KICKED_BY_PLAYER = "kicked_by_player_message";
-    private static final String CONFIG_MESSAGE_JOIN_FAILED = "join_failed_message";
     private static final String CONFIG_MESSAGE_NO_PERMISSION = "no_permission_message";
 
     private YamlConfiguration config;
@@ -88,8 +87,6 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
         if (playerToKick != null) {
             playerToKick.kickPlayer(ChatColor.translateAlternateColorCodes('&', this.config.getString(CONFIG_MESSAGE_KICKED_BY_PLAYER, "&cYou have been kicked to make room for a player with higher priority.")));
             event.allow();
-        } else {
-            event.setKickMessage(ChatColor.translateAlternateColorCodes('&', this.config.getString(CONFIG_MESSAGE_JOIN_FAILED, "This server is full")));
         }
 
     }
@@ -233,9 +230,6 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
 
                 this.config.set(CONFIG_MESSAGE_KICKED_BY_PLAYER, "&cYou have been kicked to make room for a player with higher priority");
                 this.config.setComments(CONFIG_MESSAGE_KICKED_BY_PLAYER, List.of("Players will see this message when getting kicked to make room for a player with higher priority."));
-
-                this.config.set(CONFIG_MESSAGE_JOIN_FAILED, "The server is full.");
-                this.config.setComments(CONFIG_MESSAGE_JOIN_FAILED, List.of("This message is shown to a player that cannot join the server because there is no player with a lower join level."));
 
                 this.config.set(CONFIG_MESSAGE_NO_PERMISSION, "&cNo permission");
                 this.config.setComments(CONFIG_MESSAGE_NO_PERMISSION, List.of("The message players see when they have no permission to use plugin commands."));
