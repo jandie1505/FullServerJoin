@@ -2,6 +2,7 @@ package net.jandie1505.fullserverjoin.listeners;
 
 import net.jandie1505.fullserverjoin.FullServerJoin;
 import net.jandie1505.fullserverjoin.utilities.ConfigManager;
+import net.jandie1505.fullserverjoin.utilities.TempBypassData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
@@ -9,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,6 +22,8 @@ public class LoginHandler implements Listener {
     public LoginHandler(@NotNull FullServerJoin plugin) {
         this.plugin = plugin;
     }
+
+    // ----- LOGIN -----
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerLogin(PlayerLoginEvent event) {
@@ -38,6 +42,7 @@ public class LoginHandler implements Listener {
         if (this.plugin.getPlayerBypassStatus(event.getPlayer()).isBypass()) {
             event.allow();
             this.plugin.getLogger().log(Level.INFO, "Player " + event.getPlayer().getName() + " (" + event.getPlayer().getUniqueId() + ") has bypassed the player limit (always bypass enabled).");
+            this.handleTempBypass(event);
             return;
         }
 
@@ -75,6 +80,16 @@ public class LoginHandler implements Listener {
 
         event.allow();
         this.plugin.getLogger().log(Level.INFO, "Player " + event.getPlayer().getName() + " (" + event.getPlayer().getUniqueId() + ") has bypassed the player limit (server full).");
+        this.handleTempBypass(event);
+    }
+
+    private void handleTempBypass(PlayerLoginEvent event) {
+
+        TempBypassData bypassData = this.plugin.getTemporaryBypassPlayers().get(event.getPlayer().getUniqueId());
+        if (bypassData != null) {
+            bypassData.setUsed(true);
+        }
+
     }
 
     /**
@@ -99,6 +114,13 @@ public class LoginHandler implements Listener {
         }
 
         return lowestPriorityPlayer;
+    }
+
+    // ----- LOGOUT -----
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        this.plugin.getTemporaryBypassPlayers().remove(event.getPlayer().getUniqueId());
     }
 
     public final @NotNull FullServerJoin getPlugin() {
