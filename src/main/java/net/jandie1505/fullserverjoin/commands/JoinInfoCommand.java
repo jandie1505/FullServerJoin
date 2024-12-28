@@ -5,6 +5,7 @@ import net.chaossquad.mclib.command.TabCompletingCommandExecutor;
 import net.jandie1505.fullserverjoin.FullServerJoin;
 import net.jandie1505.fullserverjoin.utilities.BypassStatus;
 import net.jandie1505.fullserverjoin.utilities.ConfigManager;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -28,7 +29,7 @@ public class JoinInfoCommand implements TabCompletingCommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
 
         if (!sender.hasPermission(FullServerJoin.PERMISSION_COMMAND_GET_JOIN_LEVEL)) {
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', this.plugin.getConfig().getString(ConfigManager.CONFIG_MESSAGE_NO_PERMISSION, "&cNo permission")));
+            MiniMessage.miniMessage().deserialize(this.plugin.getConfig().getString(ConfigManager.CONFIG_MESSAGE_NO_PERMISSION, ""));
             return true;
         }
 
