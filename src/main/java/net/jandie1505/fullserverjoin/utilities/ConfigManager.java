@@ -12,6 +12,7 @@ import java.util.logging.Level;
 
 public final class ConfigManager {
     public static final String CONFIG_MAX_LEVEL = "max_level";
+    public static final String ALWAYS_BYPASS = "always_bypass";
     public static final String CONFIG_MESSAGE_KICK = "kick_message";
     public static final String CONFIG_MESSAGE_NO_PERMISSION = "no_permission_message";
 
@@ -35,11 +36,19 @@ public final class ConfigManager {
                 "Levels which are higher than this value will be ignored."
         ));
 
+        this.config.set(ALWAYS_BYPASS, false);
+        this.config.setComments(ALWAYS_BYPASS, List.of(
+                "Sets how the bypass permission behaves.",
+                "If set to false, the player always bypasses the player limit if there is not player that can be kicked to make room for that player.",
+                "(this happens if the server is full of players with same or higher join level)",
+                "If set to true, the player always bypasses the player limit. No player will be kicked when a bypassing player joins the server."
+        ));
+
         this.config.set(CONFIG_MESSAGE_KICK, "&cYou have been kicked to make room for a player with higher priority");
         this.config.setComments(CONFIG_MESSAGE_KICK, List.of("Players will see this message when getting kicked to make room for a player with higher priority."));
 
         this.config.set(CONFIG_MESSAGE_NO_PERMISSION, "&cNo permission");
-        this.config.setComments(CONFIG_MESSAGE_NO_PERMISSION, List.of("The message players see when they have no permission to use plugin commands."));
+        this.config.setComments(CONFIG_MESSAGE_NO_PERMISSION, List.of("The message players see when they have no permission to use a plugin command."));
     }
 
     /**
