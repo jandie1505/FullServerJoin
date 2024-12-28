@@ -52,7 +52,6 @@ public class LoginHandler implements Listener {
 
     private void handleJoin(PlayerLoginEvent event) {
         int priority = this.plugin.getPlayerPriority(event.getPlayer());
-        if (priority <= 0) return;
 
         Player playerToKick = this.findPlayerToKick(priority);
 
@@ -61,18 +60,15 @@ public class LoginHandler implements Listener {
             return;
         }
 
-        if (playerToKick.hasPermission(FullServerJoin.PERMISSION_BYPASS_PLAYER_LIMIT)) {
-            try {
-                Component message = MiniMessage.miniMessage().deserialize(this.plugin.getConfig().getString(ConfigManager.CONFIG_MESSAGE_KICK, ""));
-                playerToKick.kick(message);
-            } catch (Exception e) {
-                playerToKick.kick();
-            }
-
-            this.plugin.getLogger().log(Level.INFO, "Player " + playerToKick.getName() + " (" + playerToKick.getUniqueId() + ") has been kicked to make room for " + event.getPlayer().getName() + " (" + event.getPlayer().getUniqueId() + ").");
+        try {
+            Component message = MiniMessage.miniMessage().deserialize(this.plugin.getConfig().getString(ConfigManager.CONFIG_MESSAGE_KICK, ""));
+            playerToKick.kick(message);
+        } catch (Exception e) {
+            playerToKick.kick();
         }
 
         event.allow();
+        this.plugin.getLogger().log(Level.INFO, "Player " + playerToKick.getName() + " (" + playerToKick.getUniqueId() + ") has been kicked to make room for " + event.getPlayer().getName() + " (" + event.getPlayer().getUniqueId() + ").");
     }
 
     private void noPlayerToKick(PlayerLoginEvent event) {
@@ -104,6 +100,7 @@ public class LoginHandler implements Listener {
         int lowestPriority = levelOfJoiningPlayer;
 
         for (Player player : this.plugin.getServer().getOnlinePlayers()) {
+            if (this.plugin.getPlayerBypassStatus(player).isBypass()) continue;
             int priority = this.plugin.getPlayerPriority(player);
 
             if (priority < lowestPriority) {

@@ -22,11 +22,6 @@ public class GetJoinBypassCommand implements TabCompletingCommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
 
-        if (args.length < 1) {
-            sender.sendMessage("§cYou need to specify a player name or uuid");
-            return true;
-        }
-
         String out = "§7Bypassing players: ";
 
         Iterator<UUID> i = this.plugin.getTemporaryBypassPlayers().keySet().iterator();

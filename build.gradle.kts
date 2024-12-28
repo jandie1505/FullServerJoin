@@ -15,7 +15,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
-    implementation("net.chaossquad:mclib:master-68bff2f911a10022c235778900f31d5a425bd1ca")
+    implementation("net.chaossquad:mclib:master-71951f62e2e9e0a4c73b4e6e67e7c1fcf87deea8")
 }
 
 java {}
