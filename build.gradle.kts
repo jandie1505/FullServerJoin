@@ -25,7 +25,7 @@ java {}
 
 tasks {
     shadowJar {
-        relocate("net.chaossquad.mclib", "net.jandie1505.fullserverjoin.dependencies.net.chaossquad.mclib")
+        relocate("net.chaossquad.mclib", "net.jandie1505.joinmanager.dependencies.net.chaossquad.mclib")
     }
     build {
         dependsOn(shadowJar)

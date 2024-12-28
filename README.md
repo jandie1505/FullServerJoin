@@ -9,7 +9,7 @@ A minecraft plugin for giving specific join priorities to players.
 ## Usage
 - Every player has a join priority.
 - Players with a higher join priority can kick players with a lower join priority if the server is full.
-- Join priorities are set via the permission `fullserverjoin.level.<level>`.
+- Join priorities are set via the permission `joinmanager.level.<level>`.
 - If a player has multiple join priority permission, the highest level will count.
 - Priorities must be >= 0 and lower than the maximum level.
 - Players with bypass permission can join even if the server is full.

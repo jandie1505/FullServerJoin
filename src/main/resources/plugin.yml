@@ -54,7 +54,7 @@ commands:
   joinmanager:
     description: 'Main command which contains all other commands of the plugin as subcommands'
     usage: '/joinmanager (joininfo|get-temp-join-bypass|allow-temp-join-bypass|remove-temp-join-bypass)'
-    aliases: ['fullserverjoin', 'jm', 'fsj']
+    aliases: ['jm']
   joininfo:
     description: 'Get the join priority of the specified player'
     usage: '/joininfo <player>'
