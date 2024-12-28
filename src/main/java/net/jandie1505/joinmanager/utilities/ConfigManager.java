@@ -1,6 +1,9 @@
 package net.jandie1505.joinmanager.utilities;
 
 import net.jandie1505.joinmanager.JoinManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -44,10 +47,10 @@ public final class ConfigManager {
                 "If set to true, the player always bypasses the player limit. No player will be kicked when a bypassing player joins the server."
         ));
 
-        this.config.set(CONFIG_MESSAGE_KICK, "&cYou have been kicked to make room for a player with higher priority");
+        this.config.set(CONFIG_MESSAGE_KICK, MiniMessage.miniMessage().serialize(Component.text("You have been kicked to make room for a player with higher priority").color(NamedTextColor.RED)));
         this.config.setComments(CONFIG_MESSAGE_KICK, List.of("Players will see this message when getting kicked to make room for a player with higher priority."));
 
-        this.config.set(CONFIG_MESSAGE_NO_PERMISSION, "&cNo permission");
+        this.config.set(CONFIG_MESSAGE_NO_PERMISSION, MiniMessage.miniMessage().serialize(Component.text("No permission").color(NamedTextColor.RED)));
         this.config.setComments(CONFIG_MESSAGE_NO_PERMISSION, List.of("The message players see when they have no permission to use a plugin command."));
     }
 
