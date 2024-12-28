@@ -3,10 +3,12 @@ package net.jandie1505.joinmanager.commands;
 import net.chaossquad.mclib.ChatUtils;
 import net.chaossquad.mclib.command.TabCompletingCommandExecutor;
 import net.jandie1505.joinmanager.JoinManager;
+import net.jandie1505.joinmanager.utilities.ConfigManager;
 import net.jandie1505.joinmanager.utilities.TempBypassData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -27,6 +29,11 @@ public class RemoveJoinBypassCommand implements TabCompletingCommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
+
+        if (!this.plugin.getCommandPermission(sender).manage()) {
+            sender.sendMessage(MiniMessage.miniMessage().deserialize(this.plugin.getConfig().getString(ConfigManager.CONFIG_MESSAGE_NO_PERMISSION, "")));
+            return true;
+        }
 
         if (args.length < 1) {
             sender.sendMessage("§cYou need to specify a player name or uuid");
@@ -65,6 +72,8 @@ public class RemoveJoinBypassCommand implements TabCompletingCommandExecutor {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
+        if (!this.plugin.getCommandPermission(sender).manage()) return List.of();
+
         List<String> completions = new ArrayList<>();
 
         for (UUID playerId : this.plugin.getTemporaryBypassPlayers().keySet()) {

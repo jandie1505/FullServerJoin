@@ -27,7 +27,7 @@ public class JoinInfoCommand implements TabCompletingCommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
 
-        if (!sender.hasPermission(JoinManager.PERMISSION_COMMAND_GET_JOIN_LEVEL)) {
+        if (!this.plugin.getCommandPermission(sender).info()) {
             sender.sendMessage(MiniMessage.miniMessage().deserialize(this.plugin.getConfig().getString(ConfigManager.CONFIG_MESSAGE_NO_PERMISSION, "")));
             return true;
         }
@@ -61,7 +61,7 @@ public class JoinInfoCommand implements TabCompletingCommandExecutor {
      */
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
-        if (!sender.hasPermission(JoinManager.PERMISSION_COMMAND_GET_JOIN_LEVEL)) return List.of();
+        if (!this.plugin.getCommandPermission(sender).info()) return List.of();
         if (args.length == 1) return List.copyOf(this.plugin.getServer().getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
         return List.of();
     }

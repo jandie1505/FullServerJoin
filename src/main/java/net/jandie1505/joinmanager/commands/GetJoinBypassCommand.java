@@ -2,6 +2,8 @@ package net.jandie1505.joinmanager.commands;
 
 import net.chaossquad.mclib.command.TabCompletingCommandExecutor;
 import net.jandie1505.joinmanager.JoinManager;
+import net.jandie1505.joinmanager.utilities.ConfigManager;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -21,6 +23,11 @@ public class GetJoinBypassCommand implements TabCompletingCommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
+
+        if (!this.plugin.getCommandPermission(sender).info()) {
+            sender.sendMessage(MiniMessage.miniMessage().deserialize(this.plugin.getConfig().getString(ConfigManager.CONFIG_MESSAGE_NO_PERMISSION, "")));
+            return true;
+        }
 
         String out = "§7Bypassing players: ";
 

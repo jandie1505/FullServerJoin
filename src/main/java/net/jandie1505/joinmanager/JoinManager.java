@@ -8,9 +8,11 @@ import net.jandie1505.joinmanager.commands.JoinInfoCommand;
 import net.jandie1505.joinmanager.commands.RemoveJoinBypassCommand;
 import net.jandie1505.joinmanager.listeners.LoginHandler;
 import net.jandie1505.joinmanager.utilities.BypassStatus;
+import net.jandie1505.joinmanager.utilities.CommandPermission;
 import net.jandie1505.joinmanager.utilities.ConfigManager;
 import net.jandie1505.joinmanager.utilities.TempBypassData;
 import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -26,10 +28,11 @@ import java.util.Map;
 import java.util.UUID;
 
 public class JoinManager extends JavaPlugin implements Listener, CommandExecutor, TabCompleter {
-    public static final String PERMISSION_BYPASS_PLAYER_LIMIT = "fullserverjoin.bypass";
-    public static final String PERMISSION_PREFIX_JOIN_LEVEL = "fullserverjoin.level.";
-    public static final String PERMISSION_JOIN_LEVEL_HIGHEST = PERMISSION_PREFIX_JOIN_LEVEL + "highest";
-    public static final String PERMISSION_COMMAND_GET_JOIN_LEVEL = "fullserverjoin.command.joininfo";
+    public static final String PERMISSION_BYPASS = "joinmanager.bypass";
+    public static final String PERMISSION_LEVEL_PREFIX = "joinmanager.level.";
+    public static final String PERMISSION_LEVEL_HIGHEST = PERMISSION_LEVEL_PREFIX + "highest";
+    public static final String PERMISSION_COMMAND_INFO = "joinmanager.command.info";
+    public static final String PERMISSION_COMMAND_MANAGE = "joinmanager.command.manage";
 
     @NotNull private final ConfigManager configManager;
     @NotNull private final Map<UUID, TempBypassData> temporaryBypassPlayers;
@@ -113,7 +116,7 @@ public class JoinManager extends JavaPlugin implements Listener, CommandExecutor
 
         // info
 
-        this.getLogger().info("Successfully activated FULL SERVER JOIN (version " + this.getDescription().getVersion() + "), created by jandie1505.");
+        this.getLogger().info("Successfully activated JoinManager (version " + this.getDescription().getVersion() + "), created by jandie1505.");
 
     }
 
@@ -127,7 +130,7 @@ public class JoinManager extends JavaPlugin implements Listener, CommandExecutor
     @NotNull
     public final BypassStatus getPlayerBypassStatus(@NotNull Player player) {
 
-        if (player.hasPermission(PERMISSION_BYPASS_PLAYER_LIMIT) || this.getPlayerPriority(player) == Integer.MAX_VALUE) {
+        if (player.hasPermission(PERMISSION_BYPASS) || this.getPlayerPriority(player) == Integer.MAX_VALUE) {
             return BypassStatus.PERMANENT;
         }
 
@@ -145,21 +148,40 @@ public class JoinManager extends JavaPlugin implements Listener, CommandExecutor
      */
     public int getPlayerPriority(@NotNull Player player) {
 
-        if (player.hasPermission(PERMISSION_JOIN_LEVEL_HIGHEST)) return Integer.MAX_VALUE;
+        if (player.hasPermission(PERMISSION_LEVEL_HIGHEST)) return Integer.MAX_VALUE;
 
         int priority = 0; // Default priority for players without the permission
 
-        if (player.hasPermission(PERMISSION_PREFIX_JOIN_LEVEL + "highest")) {
+        if (player.hasPermission(PERMISSION_LEVEL_PREFIX + "highest")) {
             return Integer.MAX_VALUE;
         }
 
         for (int i = this.getConfig().getInt(ConfigManager.CONFIG_MAX_LEVEL, 10); i >= 0; i--) {
-            if (player.hasPermission(PERMISSION_PREFIX_JOIN_LEVEL + i)) {
+            if (player.hasPermission(PERMISSION_LEVEL_PREFIX + i)) {
                 return i;
             }
         }
 
         return priority;
+    }
+
+    /**
+     * Returns the command permission.
+     * @param sender command sender
+     * @return permission for commands
+     */
+    @NotNull
+    public CommandPermission getCommandPermission(@NotNull CommandSender sender) {
+
+        if (sender.hasPermission(PERMISSION_COMMAND_MANAGE)) {
+            return CommandPermission.MANAGE;
+        }
+
+        if (sender.hasPermission(PERMISSION_COMMAND_INFO)) {
+            return CommandPermission.INFO;
+        }
+
+        return CommandPermission.NONE;
     }
 
     // ----- TASKS -----
