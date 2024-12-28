@@ -35,7 +35,7 @@ public class LoginHandler implements Listener {
 
     private void alwaysBypass(PlayerLoginEvent event) {
 
-        if (this.plugin.canPlayerBypass(event.getPlayer())) {
+        if (this.plugin.getPlayerBypassStatus(event.getPlayer()).isBypass()) {
             event.allow();
             this.plugin.getLogger().log(Level.INFO, "Player " + event.getPlayer().getName() + " (" + event.getPlayer().getUniqueId() + ") has bypassed the player limit (always bypass enabled).");
             return;
@@ -71,7 +71,7 @@ public class LoginHandler implements Listener {
     }
 
     private void noPlayerToKick(PlayerLoginEvent event) {
-        if (!this.plugin.canPlayerBypass(event.getPlayer())) return;
+        if (!this.plugin.getPlayerBypassStatus(event.getPlayer()).isBypass()) return;
 
         event.allow();
         this.plugin.getLogger().log(Level.INFO, "Player " + event.getPlayer().getName() + " (" + event.getPlayer().getUniqueId() + ") has bypassed the player limit (server full).");
