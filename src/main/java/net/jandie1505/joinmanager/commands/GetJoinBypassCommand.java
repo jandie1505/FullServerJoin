@@ -1,7 +1,7 @@
-package net.jandie1505.fullserverjoin.commands;
+package net.jandie1505.joinmanager.commands;
 
 import net.chaossquad.mclib.command.TabCompletingCommandExecutor;
-import net.jandie1505.fullserverjoin.FullServerJoin;
+import net.jandie1505.joinmanager.JoinManager;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.UUID;
 
 public class GetJoinBypassCommand implements TabCompletingCommandExecutor {
-    @NotNull private final FullServerJoin plugin;
+    @NotNull private final JoinManager plugin;
 
-    public GetJoinBypassCommand(@NotNull FullServerJoin plugin) {
+    public GetJoinBypassCommand(@NotNull JoinManager plugin) {
         this.plugin = plugin;
     }
 
@@ -49,7 +49,7 @@ public class GetJoinBypassCommand implements TabCompletingCommandExecutor {
         return List.of();
     }
 
-    public @NotNull FullServerJoin getPlugin() {
+    public @NotNull JoinManager getPlugin() {
         return plugin;
     }
 

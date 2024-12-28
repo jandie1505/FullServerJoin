@@ -1,4 +1,4 @@
-package net.jandie1505.fullserverjoin.utilities;
+package net.jandie1505.joinmanager.utilities;
 
 public final class TempBypassData {
     private final long removeAtEpoch;

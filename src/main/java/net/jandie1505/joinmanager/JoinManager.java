@@ -1,15 +1,15 @@
-package net.jandie1505.fullserverjoin;
+package net.jandie1505.joinmanager;
 
 import net.chaossquad.mclib.command.SubcommandCommand;
 import net.chaossquad.mclib.command.SubcommandEntry;
-import net.jandie1505.fullserverjoin.commands.AllowJoinBypassCommand;
-import net.jandie1505.fullserverjoin.commands.GetJoinBypassCommand;
-import net.jandie1505.fullserverjoin.commands.JoinInfoCommand;
-import net.jandie1505.fullserverjoin.commands.RemoveJoinBypassCommand;
-import net.jandie1505.fullserverjoin.listeners.LoginHandler;
-import net.jandie1505.fullserverjoin.utilities.BypassStatus;
-import net.jandie1505.fullserverjoin.utilities.ConfigManager;
-import net.jandie1505.fullserverjoin.utilities.TempBypassData;
+import net.jandie1505.joinmanager.commands.AllowJoinBypassCommand;
+import net.jandie1505.joinmanager.commands.GetJoinBypassCommand;
+import net.jandie1505.joinmanager.commands.JoinInfoCommand;
+import net.jandie1505.joinmanager.commands.RemoveJoinBypassCommand;
+import net.jandie1505.joinmanager.listeners.LoginHandler;
+import net.jandie1505.joinmanager.utilities.BypassStatus;
+import net.jandie1505.joinmanager.utilities.ConfigManager;
+import net.jandie1505.joinmanager.utilities.TempBypassData;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class FullServerJoin extends JavaPlugin implements Listener, CommandExecutor, TabCompleter {
+public class JoinManager extends JavaPlugin implements Listener, CommandExecutor, TabCompleter {
     public static final String PERMISSION_BYPASS_PLAYER_LIMIT = "fullserverjoin.bypass";
     public static final String PERMISSION_PREFIX_JOIN_LEVEL = "fullserverjoin.level.";
     public static final String PERMISSION_JOIN_LEVEL_HIGHEST = PERMISSION_PREFIX_JOIN_LEVEL + "highest";
@@ -34,7 +34,7 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
     @NotNull private final ConfigManager configManager;
     @NotNull private final Map<UUID, TempBypassData> temporaryBypassPlayers;
 
-    public FullServerJoin() {
+    public JoinManager() {
         this.configManager = new ConfigManager(this);
         this.temporaryBypassPlayers = new HashMap<>();
     }
@@ -68,13 +68,13 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
         command.addSubcommand("joininfo", SubcommandEntry.of(joinInfoCommand));
 
         GetJoinBypassCommand getJoinBypassCommand = new GetJoinBypassCommand(this);
-        command.addSubcommand("get-join-bypass", SubcommandEntry.of(getJoinBypassCommand));
+        command.addSubcommand("get-temp-join-bypass", SubcommandEntry.of(getJoinBypassCommand));
 
         AllowJoinBypassCommand allowJoinBypassCommand = new AllowJoinBypassCommand(this);
-        command.addSubcommand("allow-join-bypass", SubcommandEntry.of(allowJoinBypassCommand));
+        command.addSubcommand("allow-temp-join-bypass", SubcommandEntry.of(allowJoinBypassCommand));
 
         RemoveJoinBypassCommand removeJoinBypassCommand = new RemoveJoinBypassCommand(this);
-        command.addSubcommand("remove-join-bypass", SubcommandEntry.of(removeJoinBypassCommand));
+        command.addSubcommand("remove-temp-join-bypass", SubcommandEntry.of(removeJoinBypassCommand));
 
         // other commands standalone
 
@@ -84,19 +84,19 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
             joinInfoPluginCommand.setTabCompleter(joinInfoCommand);
         }
 
-        PluginCommand getJoinBypassPluginCommand = this.getCommand("get-join-bypass");
+        PluginCommand getJoinBypassPluginCommand = this.getCommand("get-temp-join-bypass");
         if (getJoinBypassPluginCommand != null) {
             getJoinBypassPluginCommand.setExecutor(getJoinBypassCommand);
             getJoinBypassPluginCommand.setTabCompleter(getJoinBypassCommand);
         }
 
-        PluginCommand allowJoinBypassPluginCommand = this.getCommand("allow-join-bypass");
+        PluginCommand allowJoinBypassPluginCommand = this.getCommand("allow-temp-join-bypass");
         if (allowJoinBypassPluginCommand != null) {
             allowJoinBypassPluginCommand.setExecutor(allowJoinBypassCommand);
             allowJoinBypassPluginCommand.setTabCompleter(allowJoinBypassCommand);
         }
 
-        PluginCommand removeJoinBypassPluginCommand = this.getCommand("remove-join-bypass");
+        PluginCommand removeJoinBypassPluginCommand = this.getCommand("remove-temp-join-bypass");
         if (removeJoinBypassPluginCommand != null) {
             removeJoinBypassPluginCommand.setExecutor(removeJoinBypassCommand);
             removeJoinBypassPluginCommand.setTabCompleter(removeJoinBypassCommand);
@@ -107,7 +107,7 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
         new BukkitRunnable() {
             @Override
             public void run() {
-                FullServerJoin.this.temporaryBypassCleanupTask();
+                JoinManager.this.temporaryBypassCleanupTask();
             }
         }.runTaskTimer(this, 1, 30*20);
 

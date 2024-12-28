@@ -1,4 +1,4 @@
-package net.jandie1505.fullserverjoin.utilities;
+package net.jandie1505.joinmanager.utilities;
 
 public enum BypassStatus {
     NOT_AVAILABLE(false),

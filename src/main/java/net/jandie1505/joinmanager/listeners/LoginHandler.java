@@ -1,8 +1,8 @@
-package net.jandie1505.fullserverjoin.listeners;
+package net.jandie1505.joinmanager.listeners;
 
-import net.jandie1505.fullserverjoin.FullServerJoin;
-import net.jandie1505.fullserverjoin.utilities.ConfigManager;
-import net.jandie1505.fullserverjoin.utilities.TempBypassData;
+import net.jandie1505.joinmanager.JoinManager;
+import net.jandie1505.joinmanager.utilities.ConfigManager;
+import net.jandie1505.joinmanager.utilities.TempBypassData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
@@ -17,9 +17,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.logging.Level;
 
 public class LoginHandler implements Listener {
-    @NotNull private final FullServerJoin plugin;
+    @NotNull private final JoinManager plugin;
 
-    public LoginHandler(@NotNull FullServerJoin plugin) {
+    public LoginHandler(@NotNull JoinManager plugin) {
         this.plugin = plugin;
     }
 
@@ -120,7 +120,7 @@ public class LoginHandler implements Listener {
         this.plugin.getTemporaryBypassPlayers().remove(event.getPlayer().getUniqueId());
     }
 
-    public final @NotNull FullServerJoin getPlugin() {
+    public final @NotNull JoinManager getPlugin() {
         return plugin;
     }
 

@@ -1,6 +1,6 @@
-package net.jandie1505.fullserverjoin.utilities;
+package net.jandie1505.joinmanager.utilities;
 
-import net.jandie1505.fullserverjoin.FullServerJoin;
+import net.jandie1505.joinmanager.JoinManager;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -16,10 +16,10 @@ public final class ConfigManager {
     public static final String CONFIG_MESSAGE_KICK = "kick_message";
     public static final String CONFIG_MESSAGE_NO_PERMISSION = "no_permission_message";
 
-    @NotNull private final FullServerJoin plugin;
+    @NotNull private final JoinManager plugin;
     @NotNull private YamlConfiguration config;
 
-    public ConfigManager(@NotNull FullServerJoin plugin) {
+    public ConfigManager(@NotNull JoinManager plugin) {
         this.plugin = plugin;
         this.resetConfig();
     }
@@ -103,7 +103,7 @@ public final class ConfigManager {
         return new File(this.plugin.getDataFolder(), "config.yml");
     }
 
-    public @NotNull FullServerJoin getPlugin() {
+    public @NotNull JoinManager getPlugin() {
         return plugin;
     }
 

@@ -1,10 +1,10 @@
-package net.jandie1505.fullserverjoin.commands;
+package net.jandie1505.joinmanager.commands;
 
 import net.chaossquad.mclib.ChatUtils;
 import net.chaossquad.mclib.command.TabCompletingCommandExecutor;
-import net.jandie1505.fullserverjoin.FullServerJoin;
-import net.jandie1505.fullserverjoin.utilities.BypassStatus;
-import net.jandie1505.fullserverjoin.utilities.ConfigManager;
+import net.jandie1505.joinmanager.JoinManager;
+import net.jandie1505.joinmanager.utilities.BypassStatus;
+import net.jandie1505.joinmanager.utilities.ConfigManager;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class JoinInfoCommand implements TabCompletingCommandExecutor {
-    @NotNull private final FullServerJoin plugin;
+    @NotNull private final JoinManager plugin;
 
-    public JoinInfoCommand(@NotNull FullServerJoin plugin) {
+    public JoinInfoCommand(@NotNull JoinManager plugin) {
         this.plugin = plugin;
     }
 
@@ -27,7 +27,7 @@ public class JoinInfoCommand implements TabCompletingCommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
 
-        if (!sender.hasPermission(FullServerJoin.PERMISSION_COMMAND_GET_JOIN_LEVEL)) {
+        if (!sender.hasPermission(JoinManager.PERMISSION_COMMAND_GET_JOIN_LEVEL)) {
             sender.sendMessage(MiniMessage.miniMessage().deserialize(this.plugin.getConfig().getString(ConfigManager.CONFIG_MESSAGE_NO_PERMISSION, "")));
             return true;
         }
@@ -61,12 +61,12 @@ public class JoinInfoCommand implements TabCompletingCommandExecutor {
      */
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
-        if (!sender.hasPermission(FullServerJoin.PERMISSION_COMMAND_GET_JOIN_LEVEL)) return List.of();
+        if (!sender.hasPermission(JoinManager.PERMISSION_COMMAND_GET_JOIN_LEVEL)) return List.of();
         if (args.length == 1) return List.copyOf(this.plugin.getServer().getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
         return List.of();
     }
 
-    public @NotNull FullServerJoin getPlugin() {
+    public @NotNull JoinManager getPlugin() {
         return plugin;
     }
 

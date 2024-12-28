@@ -1,9 +1,9 @@
-package net.jandie1505.fullserverjoin.commands;
+package net.jandie1505.joinmanager.commands;
 
 import net.chaossquad.mclib.ChatUtils;
 import net.chaossquad.mclib.command.TabCompletingCommandExecutor;
-import net.jandie1505.fullserverjoin.FullServerJoin;
-import net.jandie1505.fullserverjoin.utilities.TempBypassData;
+import net.jandie1505.joinmanager.JoinManager;
+import net.jandie1505.joinmanager.utilities.TempBypassData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.UUID;
 
 public class AllowJoinBypassCommand implements TabCompletingCommandExecutor {
-    @NotNull private final FullServerJoin plugin;
+    @NotNull private final JoinManager plugin;
 
-    public AllowJoinBypassCommand(@NotNull FullServerJoin plugin) {
+    public AllowJoinBypassCommand(@NotNull JoinManager plugin) {
         this.plugin = plugin;
     }
 
@@ -70,7 +70,7 @@ public class AllowJoinBypassCommand implements TabCompletingCommandExecutor {
         return List.of();
     }
 
-    public @NotNull FullServerJoin getPlugin() {
+    public @NotNull JoinManager getPlugin() {
         return plugin;
     }
 

@@ -1,40 +1,76 @@
-main: net.jandie1505.fullserverjoin.FullServerJoin
-name: 'FullServerJoin'
+main: net.jandie1505.joinmanager.JoinManager
+name: 'JoinManager'
 version: 1.0
 permissions:
-  fullserverjoin.command.joinmanager:
-    description: 'Permission for command /joininfo'
-  fullserverjoin.bypass:
+  joinmanager.command.info:
+    description: 'Permission for command joininfo and get-temp-join-bypass'
+  joinmanager.command.manage:
+    description: 'Permission for command allow-temp-join-bypass and remove-temp-join-bypass'
+    children:
+      - joinmanager.command.info
+  joinmanager.bypass:
     description: 'Bypass player limit on the server'
-  fullserverjoin.level.highest:
+  joinmanager.level.highest:
     description: 'Set the join level for that player to the maximum integer value. This also grants bypassin permission.'
-  fullserverjoin.level.10:
+  joinmanager.level.10:
     description: 'Specific join level'
-  fullserverjoin.level.9:
+  joinmanager.level.9:
     description: 'Specific join level'
-  fullserverjoin.level.8:
+  joinmanager.level.8:
     description: 'Specific join level'
-  fullserverjoin.level.7:
+  joinmanager.level.7:
     description: 'Specific join level'
-  fullserverjoin.level.6:
+  joinmanager.level.6:
     description: 'Specific join level'
-  fullserverjoin.level.5:
+  joinmanager.level.5:
     description: 'Specific join level'
-  fullserverjoin.level.4:
+  joinmanager.level.4:
     description: 'Specific join level'
-  fullserverjoin.level.3:
+  joinmanager.level.3:
     description: 'Specific join level'
-  fullserverjoin.level.2:
+  joinmanager.level.2:
     description: 'Specific join level'
-  fullserverjoin.level.1:
+  joinmanager.level.1:
     description: 'Specific join level'
-  fullserverjoin.level.0:
+  joinmanager.level.0:
     description: 'Specific join level'
+  joinmanager.level.*:
+    description: 'Level wildcard permission'
+    children:
+      - joinmanager.level.highest
+  joinmanager.command.*:
+    description: 'Command wildcard permission'
+    children:
+      - joinmanager.command.info
+      - joinmanager.command.manage
+  joinmanager.*:
+    description: 'Wildcard permission'
+    children:
+      - joinmanager.command.info
+      - joinmanager.command.manage
+      - joinmanager.bypass
+      - joinmanager.level.highest
 commands:
   joinmanager:
-    description: 'Get the join priority of a player'
-    usage: '/joinmanager (join-info|get-temp-join-bypass|allow-temp-join-bypass|remove-temp-join-bypass)'
+    description: 'Main command which contains all other commands of the plugin as subcommands'
+    usage: '/joinmanager (joininfo|get-temp-join-bypass|allow-temp-join-bypass|remove-temp-join-bypass)'
     aliases: ['fullserverjoin', 'jm', 'fsj']
-    permission: fullserverjoin.command.joinmanager
+  joininfo:
+    description: 'Get the join priority of the specified player'
+    usage: '/joininfo <player>'
+    aliases: ['join-info']
+    permission: joinmanager.command.info
+  get-temp-join-bypass:
+    description: 'Get temporary bypassing players'
+    usage: '/get-temp-join-bypass'
+    permission: joinmanager.command.info
+  allow-temp-join-bypass:
+    description: 'Allow a player to temporary bypass the player limit'
+    usage: '/allow-temp-join-bypass <player>'
+    permission: joinmanager.command.manage
+  remove-temp-join-bypass:
+    description: 'Removes the temporary player limit bypass for the specified player'
+    usage: '/remove-temp-join-bypass <player>'
+    permission: joinmanager.command.manage
 api-version: 1.13
 website: 'https://github.com/jandie1505/'
