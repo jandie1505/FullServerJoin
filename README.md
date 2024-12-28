@@ -1,4 +1,4 @@
-# FullServerJoin
+# JoinManager
 A minecraft plugin for giving specific join priorities to players.
 
 ## Installation
@@ -15,20 +15,26 @@ A minecraft plugin for giving specific join priorities to players.
 - Players with bypass permission can join even if the server is full.
 
 ## Commands
-With the command `/joininfo [player]`, you can get the join priority of a player.  
-The command requires the permission `fullserverjoin.command.joininfo`.
+| Command                             | Permission                   | Description                                                  |
+|-------------------------------------|------------------------------|--------------------------------------------------------------|
+| `/joininfo [<player>]`              | `joinmanager.command.info`   | Shows join level and bypass status of player                 |
+| `/get-temp-join-bypass`             | `joinmanager.command.info`   | Shows players temporary bypassing the player limit.          |
+| `/allow-temp-join-bypass <player>`  | `joinmanager.command.manage` | Allows a player to temporary bypass the player limit.        |
+| `/remove-temp-join-bypass <player>` | `joinmanager.command.manage` | Removes the permission to temporary byoass the player limit. |
 
 ## Permissions
-| Permission | Description |
-|--|--|
-| `fullserverjoin.level.<level>` | Set a specific join priority. Replace <level> with the priority. |
-| `fullserverjoin.level.highest` | Set the join priority to the maximum integer value. Ignores max. level. |
-| `fullserverjoin.command.joininfo` | Allows the usage of the command `/getjoinpriority` |
-| `fullserverjoin.bypass` | Bypass the player limit on the server. |
+| Permission                   | Description                                                              |
+|------------------------------|--------------------------------------------------------------------------|
+| `joinmanager.level.<level>`  | Set a specific join priority. Replace <level> with the priority.         |
+| `joinmanager.level.highest`  | Set the join priority to the maximum integer value. Ignores max. level.  |
+| `joinmanager.bypass`         | Bypass the player limit on the server.                                   |
+| `joinmanager.command.info`   | Grants access to `/joininfo` and `/get-temp-join-bypass`.                |
+| `joinmanager.command.bypass` | Grants access to `/allow-temp-join-bypass` and `remove-temp-join-bypass` |
 
 ## Configuration
-| Value | Description |
-|--|--|
-| `max_level` | The maximum join priority a player can have. Higher priorities than this value will be ignored. |
-| `kick_message` | The message a player will see when getting kicked for a player with higher priority. |
-| `no_permission_message` | The message a player will see when trying to run a command without the permission. |
+| Value                   | Description                                                                                     |
+|-------------------------|-------------------------------------------------------------------------------------------------|
+| `max_level`             | The maximum join priority a player can have. Higher priorities than this value will be ignored. |
+| `always_bypass`         | If enabled, players with the bypass permission will never kick players when joining.            |
+| `kick_message`          | The message a player will see when getting kicked for a player with higher priority.            |
+| `no_permission_message` | The message a player will see when trying to run a command without the permission.              |
