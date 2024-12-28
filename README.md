@@ -6,7 +6,7 @@ A minecraft plugin for giving specific join priorities to players.
 2. Put the plugin jar into your plugins folder
 3. Restart the server
 
-## Usage
+## How it works
 - Every player has a join priority.
 - Players with a higher join priority can kick players with a lower join priority if the server is full.
 - Join priorities are set via the permission `joinmanager.level.<level>`.
