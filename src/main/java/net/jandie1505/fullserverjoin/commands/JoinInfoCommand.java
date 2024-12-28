@@ -3,12 +3,11 @@ package net.jandie1505.fullserverjoin.commands;
 import net.chaossquad.mclib.ChatUtils;
 import net.chaossquad.mclib.command.TabCompletingCommandExecutor;
 import net.jandie1505.fullserverjoin.FullServerJoin;
+import net.jandie1505.fullserverjoin.utilities.BypassStatus;
 import net.jandie1505.fullserverjoin.utilities.ConfigManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,9 +45,12 @@ public class JoinInfoCommand implements TabCompletingCommandExecutor {
             return true;
         }
 
+        int priority = this.plugin.getPlayerPriority(player);
+        BypassStatus bypassStatus = this.plugin.getPlayerBypassStatus(player);
+
         sender.sendMessage("§7Join information about " + player.getName() + ":§r\n" +
-                "§7- Priority: " + this.plugin.getPlayerPriority(player) + "§r\n" +
-                "§7- Bypass permission: " + player.hasPermission(FullServerJoin.PERMISSION_BYPASS_PLAYER_LIMIT) + "§r"
+                "§7- Priority: " + (priority == Integer.MAX_VALUE ? "max (" + priority + ")" : priority) + "§r\n" +
+                "§7- Bypass: " + bypassStatus + " (" + bypassStatus.isBypass() + ")" + "§r"
         );
 
         return true;

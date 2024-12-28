@@ -1,9 +1,10 @@
 package net.jandie1505.fullserverjoin;
 
+import net.chaossquad.mclib.command.SubcommandCommand;
 import net.chaossquad.mclib.command.SubcommandEntry;
-import net.jandie1505.fullserverjoin.commands.FSJCommand;
 import net.jandie1505.fullserverjoin.commands.JoinInfoCommand;
 import net.jandie1505.fullserverjoin.listeners.LoginHandler;
+import net.jandie1505.fullserverjoin.utilities.BypassStatus;
 import net.jandie1505.fullserverjoin.utilities.ConfigManager;
 import org.bukkit.command.*;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -39,7 +40,7 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
 
         PluginCommand pluginCommand = this.getCommand("fullserverjoin");
         assert pluginCommand != null;
-        FSJCommand command = new FSJCommand(this);
+        SubcommandCommand command = new SubcommandCommand(this);
         pluginCommand.setExecutor(command);
         pluginCommand.setTabCompleter(command);
 
@@ -64,8 +65,14 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
 
     // ----- PLAYER JOIN PRIORITY -----
 
-    public final boolean canPlayerBypass(Player player) {
-        return this.getPlayerPriority(player) == Integer.MAX_VALUE || player.hasPermission(PERMISSION_BYPASS_PLAYER_LIMIT);
+    @NotNull
+    public final BypassStatus getPlayerBypassStatus(@NotNull Player player) {
+
+        if (player.hasPermission(PERMISSION_BYPASS_PLAYER_LIMIT) || this.getPlayerPriority(player) == Integer.MAX_VALUE) {
+            return BypassStatus.PERMANENT;
+        }
+
+        return BypassStatus.NOT_AVAILABLE;
     }
 
     /**
