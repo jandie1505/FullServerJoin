@@ -13,6 +13,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
 public class FullServerJoin extends JavaPlugin implements Listener, CommandExecutor, TabCompleter {
     public static final String PERMISSION_BYPASS_PLAYER_LIMIT = "fullserverjoin.bypass";
     public static final String PERMISSION_PREFIX_JOIN_LEVEL = "fullserverjoin.level.";
@@ -20,9 +24,11 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
     public static final String PERMISSION_COMMAND_GET_JOIN_LEVEL = "fullserverjoin.command.joininfo";
 
     @NotNull private final ConfigManager configManager;
+    @NotNull private final Set<UUID> temporaryBypassPlayers;
 
     public FullServerJoin() {
         this.configManager = new ConfigManager(this);
+        this.temporaryBypassPlayers = new HashSet<>();
     }
 
     @Override
@@ -31,6 +37,10 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
         // config
 
         this.configManager.reloadConfig();
+
+        // temp bypass set
+
+        this.temporaryBypassPlayers.clear();
 
         // events
 
@@ -63,6 +73,11 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
 
     }
 
+    @Override
+    public void onDisable() {
+        this.temporaryBypassPlayers.clear();
+    }
+
     // ----- PLAYER JOIN PRIORITY -----
 
     @NotNull
@@ -70,6 +85,10 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
 
         if (player.hasPermission(PERMISSION_BYPASS_PLAYER_LIMIT) || this.getPlayerPriority(player) == Integer.MAX_VALUE) {
             return BypassStatus.PERMANENT;
+        }
+
+        if (this.temporaryBypassPlayers.contains(player.getUniqueId())) {
+            return BypassStatus.TEMPORARY;
         }
 
         return BypassStatus.NOT_AVAILABLE;
@@ -99,11 +118,16 @@ public class FullServerJoin extends JavaPlugin implements Listener, CommandExecu
         return priority;
     }
 
-    // ----- CONFIG -----
+    // ----- OTHER -----
 
     @NotNull
     public YamlConfiguration getConfig() {
         return this.configManager.getConfig();
+    }
+
+    @NotNull
+    public Set<UUID> getTemporaryBypassPlayers() {
+        return this.temporaryBypassPlayers;
     }
 
 }
